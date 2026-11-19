@@ -605,12 +605,11 @@
 
   <script>
     // =========================================================================
-    // CONFIGURATION: Paste your published Google Sheet CSV URL between quotes:
-    // Example: "https://docs.google.com/spreadsheets/d/e/2PACX-.../pub?output=csv"
+    // CONFIGURATION: Published Google Sheet CSV URL
     // =========================================================================
     const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQexTj6CiCagds3ToHF8GZfMyiVzTGjNwor0Tx9rx2rpRoeJvKq0ugOoCulZ_DFtI_FOYj-66at5vRk/pub?gid=1559693955&single=true&output=csv";
 
-    // Fallback/Seed dataset (automatically replaced when SHEET_CSV_URL is set)
+    // Fallback/Seed dataset (used if network request fails)
     const FALLBACK_DATA = [
       {
         date: "2026-11-03",
@@ -761,17 +760,13 @@
           } else if (ch === ',') {
             row.push(cur);
             cur = "";
-          } else if (ch === '
-' && next === '
-') {
+          } else if (ch === '\r' && next === '\n') {
             row.push(cur);
             rows.push(row);
             row = [];
             cur = "";
             i++;
-          } else if (ch === '
-' || ch === '
-') {
+          } else if (ch === '\n' || ch === '\r') {
             row.push(cur);
             rows.push(row);
             row = [];
