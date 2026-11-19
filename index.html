@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Postman Pulse</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #ffffff;
+      --border: #e5e7eb;
+      --text-primary: #111827;
+      --text-secondary: #6b7280;
+      --pill-bg: #f3f4f6;
+      --accent-blue: #2563eb;
+      --green: #16a34a;
+      --gray: #9ca3af;
+      --red: #dc2626;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #fafafa;
+      color: var(--text-primary);
+      line-height: 1.5;
+      padding: 24px 16px 48px;
+    }
+
+    .container {
+      max-width: 1020px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .title-group h1 {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .day-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    select#daySelect {
+      appearance: none;
+      background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23374151' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 12px center;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 34px 7px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      cursor: pointer;
+    }
+
+    /* Setup Banner */
+    .setup-banner {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      color: #1e3a8a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .setup-banner code {
+      background: #dbeafe;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 22px;
+      margin-bottom: 16px;
+    }
+
+    .card-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-secondary);
+      margin-bottom: 14px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1.35fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .grid-2-equal {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .grid-2 .card, .grid-2-equal .card {
+      margin-bottom: 0;
+    }
+
+    @media (max-width: 768px) {
+      .grid-2, .grid-2-equal {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Sentiment Score */
+    .big-score {
+      font-size: 54px;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+    }
+
+    .big-score span {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-left: 2px;
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--pill-bg);
+      color: #374151;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-weight: 400;
+    }
+
+    .badge strong {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* Mix of Mentions */
+    .stacked-bar {
+      display: flex;
+      height: 10px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #e5e7eb;
+      margin-bottom: 10px;
+    }
+
+    .bar-pos { background: var(--green); }
+    .bar-neu { background: var(--gray); }
+    .bar-neg { background: var(--red); }
+
+    .mix-legend {
+      display: flex;
+      gap: 16px;
+      font-size: 12px;
+      color: #374151;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .mix-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+
+    .channel-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 600px) {
+      .channel-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .channel-item .ch-name {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .channel-item .ch-val {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    /* Trend */
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .tab-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: #374151;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .tab-btn:hover {
+      background: var(--pill-bg);
+    }
+
+    .tab-btn.active {
+      background: #111827;
+      color: #ffffff;
+      border-color: #111827;
+    }
+
+    .chart-wrap {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    svg#trendSvg {
+      width: 100%;
+      height: 230px;
+      display: block;
+    }
+
+    .chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 12px;
+      color: #374151;
+      margin-top: 8px;
+    }
+
+    .chart-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+
+    .chart-note {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+    }
+
+    /* Themes */
+    .theme-item {
+      margin-bottom: 14px;
+    }
+    .theme-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .theme-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .theme-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .theme-count {
+      font-size: 12px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    .theme-desc {
+      font-size: 13px;
+      color: #374151;
+      margin-bottom: 4px;
+    }
+
+    .theme-sources a {
+      font-size: 12.5px;
+      color: var(--accent-blue);
+      text-decoration: underline;
+      margin-right: 10px;
+    }
+
+    .empty-text {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+    }
+
+    /* Against the Field */
+    .comp-row {
+      display: grid;
+      grid-template-columns: 110px 1fr 48px;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+    }
+
+    .comp-name {
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .comp-bar-area {
+      position: relative;
+      height: 12px;
+      display: flex;
+      align-items: center;
+    }
+
+    .comp-zero {
+      position: absolute;
+      left: 50%;
+      top: -3px;
+      bottom: -3px;
+      width: 1px;
+      background: #d1d5db;
+    }
+
+    .comp-bar {
+      position: absolute;
+      height: 12px;
+      border-radius: 2px;
+      background: var(--accent-blue);
+    }
+
+    .comp-no-data {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+    }
+
+    .comp-score {
+      text-align: right;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    /* Mentions Behind the Score */
+    .mention-row {
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    .mention-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .mention-score {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      padding-top: 1px;
+    }
+
+    .mention-title {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--accent-blue);
+      text-decoration: underline;
+      display: inline-block;
+      margin-bottom: 2px;
+    }
+
+    .mention-meta {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+    }
+
+    /* Footer Accordion */
+    details.method-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 20px;
+      font-size: 13px;
+      color: #374151;
+    }
+
+    details.method-card summary {
+      font-weight: 500;
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-primary);
+    }
+
+    details.method-card summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.method-card summary::before {
+      content: "▶";
+      font-size: 10px;
+      color: var(--text-secondary);
+      transition: transform 0.15s ease;
+    }
+
+    details.method-card[open] summary::before {
+      transform: rotate(90deg);
+    }
+
+    .method-body {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="setupBanner" class="setup-banner">
+      <div>
+        <strong>Live Sheet Sync Ready:</strong> Paste your published Google Sheet CSV URL into <code>SHEET_CSV_URL</code> inside this file to auto-load daily updates. Currently displaying embedded baseline records.
+      </div>
+      <span id="syncStatus" style="font-weight:600;">Embedded Mode</span>
+    </div>
+
+    <header>
+      <div class="title-group">
+        <h1>Postman Pulse</h1>
+        <div class="subtitle" id="reportSubtitle">Loading report...</div>
+      </div>
+      <div class="day-control">
+        <label for="daySelect">Day</label>
+        <select id="daySelect"></select>
+      </div>
+    </header>
+
+    <!-- Row 1: Sentiment Score + Mix of Mentions -->
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-label">Sentiment Score</div>
+        <div class="big-score" id="overallScore">—<span>/ 100</span></div>
+        <div class="badges" id="deltaBadges"></div>
+        <div class="badges" id="confidenceBadge"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Mix of Mentions</div>
+        <div class="stacked-bar">
+          <div class="bar-pos" id="barPos" style="width:0%"></div>
+          <div class="bar-neu" id="barNeu" style="width:0%"></div>
+          <div class="bar-neg" id="barNeg" style="width:0%"></div>
+        </div>
+        <div class="mix-legend">
+          <div class="mix-legend-item"><span class="dot" style="background:var(--green)"></span> <span id="lblPos">Positive 0%</span></div>
+          <div class="mix-legend-item"><span class="dot" style="background:var(--gray)"></span> <span id="lblNeu">Neutral 0%</span></div>
+          <div class="mix-legend-item"><span class="dot" style="background:var(--red)"></span> <span id="lblNeg">Negative 0%</span></div>
+        </div>
+        <div class="channel-grid">
+          <div class="channel-item">
+            <div class="ch-name">News &amp; blogs</div>
+            <div class="ch-val" id="chNews">—</div>
+          </div>
+          <div class="channel-item">
+            <div class="ch-name">Dev communities</div>
+            <div class="ch-val" id="chDev">—</div>
+          </div>
+          <div class="channel-item">
+            <div class="ch-name">Review sites</div>
+            <div class="ch-val" id="chReview">—</div>
+          </div>
+          <div class="channel-item">
+            <div class="ch-name">Social &amp; video</div>
+            <div class="ch-val" id="chSocial">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2: Trend -->
+    <div class="card">
+      <div class="card-label">Trend</div>
+      <div class="tabs" id="trendTabs">
+        <button class="tab-btn active" data-tab="overall">Overall</button>
+        <button class="tab-btn" data-tab="news_blogs_score">News &amp; blogs</button>
+        <button class="tab-btn" data-tab="dev_communities_score">Dev communities</button>
+        <button class="tab-btn" data-tab="review_sites_score">Review sites</button>
+        <button class="tab-btn" data-tab="social_video_score">Social &amp; video</button>
+        <button class="tab-btn" data-tab="competitors">Compare competitors</button>
+      </div>
+      <div class="chart-wrap">
+        <svg id="trendSvg" viewBox="0 0 940 230" preserveAspectRatio="none"></svg>
+      </div>
+      <div class="chart-legend" id="chartLegend"></div>
+      <div class="chart-note" id="chartNote">Thin line: daily score. Heavy line: 7-day average (shown from the third day). Gaps mean no data.</div>
+    </div>
+
+    <!-- Row 3: Doing Well & Doing Poorly -->
+    <div class="grid-2-equal">
+      <div class="card">
+        <div class="card-label">Doing Well</div>
+        <div id="doingWellList"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Doing Poorly</div>
+        <div id="doingPoorlyList"></div>
+      </div>
+    </div>
+
+    <!-- Row 4: Against the Field -->
+    <div class="card">
+      <div class="card-label">Against the Field</div>
+      <div id="competitorList"></div>
+    </div>
+
+    <!-- Row 5: Mentions Behind the Score -->
+    <div class="card">
+      <div class="card-label">Mentions Behind the Score</div>
+      <div id="mentionsList"></div>
+    </div>
+
+    <!-- Footer: Method and coverage -->
+    <details class="method-card">
+      <summary>Method and coverage</summary>
+      <div class="method-body">
+        Scores range from <strong>-100</strong> (strongly negative) to <strong>+100</strong> (strongly positive) across four public developer sources: News &amp; blogs, Dev communities (Reddit, Hacker News, Stack Overflow, GitHub), Review sites (G2, Capterra, Product Hunt), and Social &amp; video (X, Bluesky, LinkedIn, YouTube). Official Postman posts, job listings, and pure how-to tutorials without sentiment are excluded. Confidence is rated <em>low</em> (1–3 mentions), <em>medium</em> (4–12 mentions), or <em>high</em> (13+ mentions).
+      </div>
+    </details>
+  </div>
+
+  <script>
+    // =========================================================================
+    // CONFIGURATION: Paste your published Google Sheet CSV URL between quotes:
+    // Example: "https://docs.google.com/spreadsheets/d/e/2PACX-.../pub?output=csv"
+    // =========================================================================
+    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQexTj6CiCagds3ToHF8GZfMyiVzTGjNwor0Tx9rx2rpRoeJvKq0ugOoCulZ_DFtI_FOYj-66at5vRk/pub?gid=1559693955&single=true&output=csv";
+
+    // Fallback/Seed dataset (automatically replaced when SHEET_CSV_URL is set)
+    const FALLBACK_DATA = [
+      {
+        date: "2026-11-03",
+        overall_score: -58,
+        mentions_count: null,
+        confidence: "low",
+        pos_pct: 0, neu_pct: 0, neg_pct: 100,
+        news_blogs_score: null, dev_communities_score: -58, review_sites_score: null, social_video_score: null,
+        insomnia_score: null, bruno_score: null, hoppscotch_score: null, apidog_score: null,
+        doing_well: [], doing_poorly: [], mentions: []
+      },
+      {
+        date: "2026-11-04",
+        overall_score: -42,
+        mentions_count: null,
+        confidence: "low",
+        pos_pct: 0, neu_pct: 0, neg_pct: 100,
+        news_blogs_score: null, dev_communities_score: -42, review_sites_score: null, social_video_score: null,
+        insomnia_score: null, bruno_score: null, hoppscotch_score: null, apidog_score: null,
+        doing_well: [], doing_poorly: [], mentions: []
+      },
+      {
+        date: "2026-11-10",
+        overall_score: -10,
+        mentions_count: null,
+        confidence: "low",
+        pos_pct: 0, neu_pct: 0, neg_pct: 100,
+        news_blogs_score: null, dev_communities_score: -10, review_sites_score: null, social_video_score: null,
+        insomnia_score: null, bruno_score: null, hoppscotch_score: null, apidog_score: null,
+        doing_well: [], doing_poorly: [], mentions: []
+      },
+      {
+        date: "2026-11-12",
+        overall_score: -15,
+        mentions_count: 1,
+        confidence: "low",
+        pos_pct: 0, neu_pct: 0, neg_pct: 100,
+        news_blogs_score: null, dev_communities_score: -15, review_sites_score: null, social_video_score: null,
+        insomnia_score: null, bruno_score: null, hoppscotch_score: null, apidog_score: null,
+        doing_well: [],
+        doing_poorly: [
+          {
+            theme: "Heavy desktop client",
+            count: 1,
+            summary: "A Show HN post offered a small native Postman-like client without Electron, which implies that Postman is seen as heavy.",
+            sources: [{ label: "Source 1", url: "https://news.ycombinator.com" }]
+          }
+        ],
+        mentions: [
+          {
+            score: -15,
+            title: "Show HN: Postman but a free 5MB iOS and Mac client",
+            url: "https://news.ycombinator.com",
+            meta: "Hacker News · Single low-engagement post; sentiment is implied, not stated."
+          }
+        ]
+      },
+      {
+        date: "2026-11-19",
+        overall_score: -27,
+        mentions_count: 5,
+        confidence: "medium",
+        pos_pct: 20, neu_pct: 0, neg_pct: 80,
+        news_blogs_score: -20, dev_communities_score: -45, review_sites_score: null, social_video_score: -30,
+        insomnia_score: -35, bruno_score: 35, hoppscotch_score: -5, apidog_score: 20,
+        doing_well: [
+          {
+            theme: "Mature scripting & Newman CI/CD",
+            count: 1,
+            summary: "Comparative engineering evaluations still favor Postman's JavaScript test runner, Newman CLI pipelines, and enterprise governance.",
+            sources: [{ label: "Source 1", url: "https://www.frugaltesting.com" }]
+          }
+        ],
+        doing_poorly: [
+          {
+            theme: "Electron bloat & slow startup",
+            count: 2,
+            summary: "Developer benchmarks and Mac reviews criticized high memory usage, large installer footprint, and slow cold startup times.",
+            sources: [{ label: "Source 1", url: "https://dev.to" }]
+          },
+          {
+            theme: "Forced cloud login & migration to Bruno",
+            count: 2,
+            summary: "Forum comments and short-form dev videos highlighted developers switching to Git-friendly local tools like Bruno to avoid cloud sign-in friction.",
+            sources: [{ label: "Source 1", url: "https://news.ycombinator.com" }]
+          }
+        ],
+        mentions: [
+          {
+            score: 15,
+            title: "Postman vs Apidog: Enterprise API Testing & Governance Comparison",
+            url: "https://www.frugaltesting.com",
+            meta: "Engineering Blog · Praised deep JS scripting and CI/CD maturity; noted spec drift."
+          },
+          {
+            score: -35,
+            title: "Native vs Electron API Clients on macOS",
+            url: "https://dev.to",
+            meta: "Dev.to · Criticized Electron RAM overhead compared to lightweight native clients."
+          },
+          {
+            score: -40,
+            title: "API Client Cold Startup & Memory Benchmark",
+            url: "https://dev.to",
+            meta: "Developer Blog · Flagged 12.6s startup CPU spike and forced cloud account requirement."
+          },
+          {
+            score: -45,
+            title: "HN Discussion: Switching away after cloud workspace changes",
+            url: "https://news.ycombinator.com",
+            meta: "Hacker News · Developer cited Postman cloud/account backlash as trigger to migrate."
+          },
+          {
+            score: -30,
+            title: "Goodbye Postman and Insomnia: Why devs are trying Bruno",
+            url: "https://www.youtube.com",
+            meta: "YouTube · Short video advocating local Git-stored collections over Postman."
+          }
+        ]
+      }
+    ];
+
+    let records = [];
+    let selectedDate = "";
+    let activeTab = "overall";
+
+    // RFC-4180 compliant CSV parser (handles quoted JSON strings with commas)
+    function parseCSV(text) {
+      const rows = [];
+      let row = [];
+      let cur = "";
+      let inQuotes = false;
+      for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        const next = text[i + 1];
+        if (inQuotes) {
+          if (ch === '"' && next === '"') {
+            cur += '"';
+            i++;
+          } else if (ch === '"') {
+            inQuotes = false;
+          } else {
+            cur += ch;
+          }
+        } else {
+          if (ch === '"') {
+            inQuotes = true;
+          } else if (ch === ',') {
+            row.push(cur);
+            cur = "";
+          } else if (ch === '
+' && next === '
+') {
+            row.push(cur);
+            rows.push(row);
+            row = [];
+            cur = "";
+            i++;
+          } else if (ch === '
+' || ch === '
+') {
+            row.push(cur);
+            rows.push(row);
+            row = [];
+            cur = "";
+          } else {
+            cur += ch;
+          }
+        }
+      }
+      if (cur.length > 0 || row.length > 0) {
+        row.push(cur);
+        rows.push(row);
+      }
+      return rows;
+    }
+
+    function toNum(val) {
+      if (val === undefined || val === null || String(val).trim() === "") return null;
+      const n = Number(val);
+      return Number.isFinite(n) ? n : null;
+    }
+
+    function safeJSON(str, fallback = []) {
+      if (!str || String(str).trim() === "") return fallback;
+      try {
+        return JSON.parse(str);
+      } catch (e) {
+        return fallback;
+      }
+    }
+
+    function formatSigned(n) {
+      if (n === null || n === undefined) return "—";
+      return n > 0 ? `+${n}` : `${n}`;
+    }
+
+    async function loadData() {
+      const banner = document.getElementById("setupBanner");
+      const status = document.getElementById("syncStatus");
+
+      if (SHEET_CSV_URL && SHEET_CSV_URL.trim() !== "") {
+        try {
+          status.textContent = "Syncing Google Sheet...";
+          const res = await fetch(SHEET_CSV_URL.trim());
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const csvText = await res.text();
+          const rows = parseCSV(csvText).filter(r => r.some(cell => cell.trim() !== ""));
+          const headers = rows[0].map(h => h.trim());
+          const idx = (name) => headers.indexOf(name);
+
+          records = rows.slice(1).map(r => ({
+            date: (r[idx("date")] || "").trim(),
+            overall_score: toNum(r[idx("overall_score")]),
+            mentions_count: toNum(r[idx("mentions_count")]),
+            confidence: (r[idx("confidence")] || "low").trim(),
+            pos_pct: toNum(r[idx("pos_pct")]) ?? 0,
+            neu_pct: toNum(r[idx("neu_pct")]) ?? 0,
+            neg_pct: toNum(r[idx("neg_pct")]) ?? 0,
+            news_blogs_score: toNum(r[idx("news_blogs_score")]),
+            dev_communities_score: toNum(r[idx("dev_communities_score")]),
+            review_sites_score: toNum(r[idx("review_sites_score")]),
+            social_video_score: toNum(r[idx("social_video_score")]),
+            insomnia_score: toNum(r[idx("insomnia_score")]),
+            bruno_score: toNum(r[idx("bruno_score")]),
+            hoppscotch_score: toNum(r[idx("hoppscotch_score")]),
+            apidog_score: toNum(r[idx("apidog_score")]),
+            doing_well: safeJSON(r[idx("doing_well_json")], []),
+            doing_poorly: safeJSON(r[idx("doing_poorly_json")], []),
+            mentions: safeJSON(r[idx("mentions_json")], [])
+          })).filter(d => d.date !== "");
+
+          banner.style.display = "none";
+        } catch (err) {
+          console.error("Failed to fetch Google Sheet CSV:", err);
+          status.textContent = "Sheet Fetch Failed (Using Fallback)";
+          records = [...FALLBACK_DATA];
+        }
+      } else {
+        records = [...FALLBACK_DATA];
+      }
+
+      records.sort((a, b) => a.date.localeCompare(b.date));
+      populateDaySelect();
+      if (records.length > 0) {
+        selectedDate = records[records.length - 1].date;
+        document.getElementById("daySelect").value = selectedDate;
+        renderDashboard();
+      }
+    }
+
+    function populateDaySelect() {
+      const sel = document.getElementById("daySelect");
+      sel.innerHTML = "";
+      [...records].reverse().forEach(r => {
+        const opt = document.createElement("option");
+        opt.value = r.date;
+        opt.textContent = r.date;
+        sel.appendChild(opt);
+      });
+      sel.addEventListener("change", (e) => {
+        selectedDate = e.target.value;
+        renderDashboard();
+      });
+    }
+
+    function computeRolling7Day(index, key = "overall_score") {
+      if (index < 2) return null; // Shown from the third day
+      const slice = records.slice(Math.max(0, index - 6), index + 1)
+        .map(r => r[key])
+        .filter(v => v !== null && v !== undefined);
+      if (slice.length === 0) return null;
+      const sum = slice.reduce((a, b) => a + b, 0);
+      return Math.round(sum / slice.length);
+    }
+
+    function renderDashboard() {
+      const idx = records.findIndex(r => r.date === selectedDate);
+      if (idx === -1) return;
+      const rec = records[idx];
+
+      // Header
+      const countText = rec.mentions_count !== null ? `${rec.mentions_count} mentions scored` : "historical baseline";
+      document.getElementById("reportSubtitle").textContent = `Report for ${rec.date} · ${countText}`;
+
+      // Overall score
+      const scoreEl = document.getElementById("overallScore");
+      scoreEl.innerHTML = `${rec.overall_score !== null ? rec.overall_score : "—"}<span>/ 100</span>`;
+
+      // Deltas
+      const deltaWrap = document.getElementById("deltaBadges");
+      deltaWrap.innerHTML = "";
+
+      if (idx > 0 && rec.overall_score !== null && records[idx - 1].overall_score !== null) {
+        const diffPrev = rec.overall_score - records[idx - 1].overall_score;
+        const arrow = diffPrev >= 0 ? "▲" : "▼";
+        const b = document.createElement("span");
+        b.className = "badge";
+        b.innerHTML = `vs previous day <strong>${arrow} ${formatSigned(diffPrev)}</strong>`;
+        deltaWrap.appendChild(b);
+      }
+
+      const avg7 = computeRolling7Day(idx, "overall_score");
+      if (avg7 !== null && rec.overall_score !== null) {
+        const diff7 = rec.overall_score - avg7;
+        const arrow = diff7 >= 0 ? "▲" : "▼";
+        const b = document.createElement("span");
+        b.className = "badge";
+        b.innerHTML = `vs 7-day average <strong>${arrow} ${formatSigned(diff7)}</strong>`;
+        deltaWrap.appendChild(b);
+      }
+
+      // Confidence badge
+      const confWrap = document.getElementById("confidenceBadge");
+      confWrap.innerHTML = `<span class="badge">Confidence <strong>${rec.confidence || "low"}</strong></span>`;
+
+      // Mix of mentions
+      document.getElementById("barPos").style.width = `${rec.pos_pct}%`;
+      document.getElementById("barNeu").style.width = `${rec.neu_pct}%`;
+      document.getElementById("barNeg").style.width = `${rec.neg_pct}%`;
+      document.getElementById("lblPos").textContent = `Positive ${rec.pos_pct}%`;
+      document.getElementById("lblNeu").textContent = `Neutral ${rec.neu_pct}%`;
+      document.getElementById("lblNeg").textContent = `Negative ${rec.neg_pct}%`;
+
+      document.getElementById("chNews").textContent = rec.news_blogs_score !== null ? rec.news_blogs_score : "—";
+      document.getElementById("chDev").textContent = rec.dev_communities_score !== null ? rec.dev_communities_score : "—";
+      document.getElementById("chReview").textContent = rec.review_sites_score !== null ? rec.review_sites_score : "—";
+      document.getElementById("chSocial").textContent = rec.social_video_score !== null ? rec.social_video_score : "—";
+
+      // Doing Well & Doing Poorly
+      renderThemes("doingWellList", rec.doing_well);
+      renderThemes("doingPoorlyList", rec.doing_poorly);
+
+      // Against the Field
+      renderCompetitors(rec);
+
+      // Mentions Behind the Score
+      renderMentions(rec.mentions);
+
+      // Trend Chart
+      renderChart();
+    }
+
+    function renderThemes(elId, items) {
+      const container = document.getElementById(elId);
+      if (!items || items.length === 0) {
+        container.innerHTML = `<div class="empty-text">Nothing recorded for this day.</div>`;
+        return;
+      }
+      container.innerHTML = items.map(item => {
+        const links = (item.sources || []).map(s => `<a href="${s.url}" target="_blank" rel="noopener">${s.label}</a>`).join("");
+        return `
+          <div class="theme-item">
+            <div class="theme-header">
+              <div class="theme-title">– ${item.theme}</div>
+              <div class="theme-count">${item.count} mentions</div>
+            </div>
+            <div class="theme-desc">${item.summary}</div>
+            <div class="theme-sources">${links}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderCompetitors(rec) {
+      const rows = [
+        { name: "Postman", score: rec.overall_score },
+        { name: "Insomnia", score: rec.insomnia_score },
+        { name: "Bruno", score: rec.bruno_score },
+        { name: "Hoppscotch", score: rec.hoppscotch_score },
+        { name: "Apidog", score: rec.apidog_score }
+      ];
+
+      document.getElementById("competitorList").innerHTML = rows.map(r => {
+        if (r.score === null || r.score === undefined) {
+          return `
+            <div class="comp-row">
+              <div class="comp-name">${r.name}</div>
+              <div class="comp-no-data">No data</div>
+              <div class="comp-score">—</div>
+            </div>
+          `;
+        }
+        const clamped = Math.max(-100, Math.min(100, r.score));
+        const widthPct = Math.abs(clamped) / 2; // 50% max width on either side of center
+        const leftPct = clamped < 0 ? 50 - widthPct : 50;
+        const barColor = clamped < 0 ? "#2563eb" : "#16a34a";
+
+        return `
+          <div class="comp-row">
+            <div class="comp-name">${r.name}</div>
+            <div class="comp-bar-area">
+              <div class="comp-zero"></div>
+              <div class="comp-bar" style="left:${leftPct}%; width:${Math.max(1.5, widthPct)}%; background:${barColor};"></div>
+            </div>
+            <div class="comp-score">${r.score}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderMentions(mentions) {
+      const container = document.getElementById("mentionsList");
+      if (!mentions || mentions.length === 0) {
+        container.innerHTML = `<div class="empty-text">No individual mentions logged for this date.</div>`;
+        return;
+      }
+      container.innerHTML = mentions.map(m => `
+        <div class="mention-row">
+          <div class="mention-score">${m.score}</div>
+          <div>
+            <a class="mention-title" href="${m.url}" target="_blank" rel="noopener">${m.title}</a>
+            <div class="mention-meta">${m.meta}</div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderChart() {
+      const svg = document.getElementById("trendSvg");
+      const legendEl = document.getElementById("chartLegend");
+      const noteEl = document.getElementById("chartNote");
+
+      const W = 940, H = 230;
+      const padL = 42, padR = 24, padT = 18, padB = 30;
+      const plotW = W - padL - padR;
+      const plotH = H - padT - padB;
+
+      // Determine Y-axis bounds dynamically (rounded to nearest 10)
+      let allVals = [];
+      if (activeTab === "competitors") {
+        records.forEach(r => {
+          [r.overall_score, r.insomnia_score, r.bruno_score, r.hoppscotch_score, r.apidog_score]
+            .forEach(v => { if (v !== null) allVals.push(v); });
+        });
+      } else {
+        const key = activeTab === "overall" ? "overall_score" : activeTab;
+        records.forEach((r, i) => {
+          if (r[key] !== null) allVals.push(r[key]);
+          const avg = computeRolling7Day(i, key);
+          if (avg !== null) allVals.push(avg);
+        });
+      }
+
+      let minY = allVals.length ? Math.min(...allVals, -10) : -60;
+      let maxY = allVals.length ? Math.max(...allVals, 10) : 10;
+      minY = Math.floor(minY / 10) * 10;
+      maxY = Math.ceil(maxY / 10) * 10;
+      if (maxY === minY) { maxY += 10; minY -= 10; }
+
+      const getX = (i) => records.length === 1 ? padL + plotW / 2 : padL + (i / (records.length - 1)) * plotW;
+      const getY = (val) => padT + ((maxY - val) / (maxY - minY)) * plotH;
+
+      let out = "";
+
+      // Horizontal gridlines
+      const step = Math.max(10, Math.ceil((maxY - minY) / 7 / 10) * 10);
+      for (let yVal = minY; yVal <= maxY; yVal += step) {
+        const y = getY(yVal);
+        const label = yVal > 0 ? `+${yVal}` : `${yVal}`;
+        out += `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="#e5e7eb" stroke-width="1" />`;
+        out += `<text x="${padL - 8}" y="${y + 4}" text-anchor="end" font-size="11" fill="#6b7280">${label}</text>`;
+      }
+
+      // Vertical dashed marker on selected day
+      const selIdx = records.findIndex(r => r.date === selectedDate);
+      if (selIdx !== -1) {
+        const sx = getX(selIdx);
+        out += `<line x1="${sx}" y1="${padT}" x2="${sx}" y2="${H - padB}" stroke="#d1d5db" stroke-width="1.2" stroke-dasharray="3,3" />`;
+      }
+
+      // X-axis date labels
+      records.forEach((r, i) => {
+        const x = getX(i);
+        const shortDate = r.date.slice(5); // MM-DD
+        out += `<text x="${x}" y="${H - 8}" text-anchor="middle" font-size="11" fill="#6b7280">${shortDate}</text>`;
+      });
+
+      function drawSeries(vals, color, width, showDots = true) {
+        let path = "";
+        let drawing = false;
+        vals.forEach((v, i) => {
+          if (v === null || v === undefined) {
+            drawing = false;
+            return;
+          }
+          const x = getX(i);
+          const y = getY(v);
+          path += drawing ? ` L ${x} ${y}` : `M ${x} ${y}`;
+          drawing = true;
+        });
+        if (path) {
+          out += `<path d="${path}" fill="none" stroke="${color}" stroke-width="${width}" stroke-linecap="round" stroke-linejoin="round" />`;
+        }
+        if (showDots) {
+          vals.forEach((v, i) => {
+            if (v === null || v === undefined) return;
+            const x = getX(i);
+            const y = getY(v);
+            const r = i === selIdx ? 4 : 2.5;
+            out += `<circle cx="${x}" cy="${y}" r="${r}" fill="${color}" />`;
+          });
+        }
+      }
+
+      if (activeTab === "competitors") {
+        const series = [
+          { label: "Postman", color: "#2563eb", vals: records.map(r => r.overall_score) },
+          { label: "Bruno", color: "#16a34a", vals: records.map(r => r.bruno_score) },
+          { label: "Apidog", color: "#9333ea", vals: records.map(r => r.apidog_score) },
+          { label: "Insomnia", color: "#dc2626", vals: records.map(r => r.insomnia_score) },
+          { label: "Hoppscotch", color: "#d97706", vals: records.map(r => r.hoppscotch_score) }
+        ];
+        series.forEach(s => drawSeries(s.vals, s.color, 2, true));
+        legendEl.innerHTML = series.map(s => `
+          <div class="chart-legend-item"><span class="swatch" style="background:${s.color}"></span> ${s.label}</div>
+        `).join("");
+        noteEl.textContent = "Daily sentiment comparison across Postman and competing API clients. Gaps mean no data.";
+      } else {
+        const key = activeTab === "overall" ? "overall_score" : activeTab;
+        const labelMap = {
+          overall: "Overall",
+          news_blogs_score: "News & blogs",
+          dev_communities_score: "Dev communities",
+          review_sites_score: "Review sites",
+          social_video_score: "Social & video"
+        };
+        const dailyVals = records.map(r => r[key]);
+        const avgVals = records.map((_, i) => computeRolling7Day(i, key));
+
+        drawSeries(dailyVals, "#2563eb", 1.2, true);
+        drawSeries(avgVals, "#2563eb", 3.2, false);
+
+        legendEl.innerHTML = `
+          <div class="chart-legend-item"><span class="swatch" style="background:#2563eb"></span> ${labelMap[activeTab]}</div>
+          <div class="chart-legend-item"><span class="swatch" style="background:#2563eb"></span> 7-day average</div>
+        `;
+        noteEl.textContent = "Thin line: daily score. Heavy line: 7-day average (shown from the third day). Gaps mean no data.";
+      }
+
+      svg.innerHTML = out;
+    }
+
+    document.getElementById("trendTabs").addEventListener("click", (e) => {
+      if (!e.target.classList.contains("tab-btn")) return;
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      e.target.classList.add("active");
+      activeTab = e.target.dataset.tab;
+      renderChart();
+    });
+
+    loadData();
+  </script>
+</body>
+</html>
